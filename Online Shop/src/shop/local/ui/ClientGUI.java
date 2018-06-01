@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.swing.JButton;
@@ -25,15 +26,18 @@ import shop.local.domain.Shop;
 import shop.local.domain.exceptions.ArtikelNichtVorhandenException;
 import shop.local.domain.exceptions.NutzerNichtVorhandenException;
 import shop.local.ui.Listener.RegListener;
+import shop.local.ui.Listener.SuchListener;
 import shop.local.ui.Listener.MainListener;
+import shop.local.ui.panels.ArtikellistePanel;
 import shop.local.ui.panels.ButtonsPanel;
 import shop.local.ui.panels.RegistrierenPanel;
 import shop.local.ui.panels.SearchPanel;
 import shop.local.ui.panels.WarenkorbPanel;
 import shop.local.ui.werkzeuge.ButtonColumn;
+import shop.local.valueobjects.Artikel;
 import shop.local.valueobjects.Nutzer;
 
-public class ClientGUI extends JFrame implements RegListener, MainListener {
+public class ClientGUI extends JFrame implements RegListener, MainListener, SuchListener {
 
 	// Deklaration
 	private Shop shop;
@@ -43,7 +47,7 @@ public class ClientGUI extends JFrame implements RegListener, MainListener {
 	private boolean kunde = false;
 	UUID aktuelleUUID;
 	private Nutzer nutzer;
-	
+	private ArtikellistePanel artikellistePanel;
 	
 	
 	JPanel header = new JPanel();
@@ -119,17 +123,20 @@ public class ClientGUI extends JFrame implements RegListener, MainListener {
 	public void mainPanel() {
 		header.removeAll();
 		content.removeAll();
-		searchPanel = new SearchPanel();
+		searchPanel = new SearchPanel(shop, this);
 		header.add(searchPanel, "width 100%");
 		header.add(new ButtonsPanel("Main", this));
-		WarenkorbPanel warenkorbPanel = new WarenkorbPanel(shop.alleArtikelAusgeben());
-	
-		
-		content.add(warenkorbPanel, "width 50%:100%, height 50%:100%");
+		JTable tabelle = new JTable();
+		artikellistePanel = new ArtikellistePanel(shop.alleArtikelAusgeben());
+		content.add(new JScrollPane(artikellistePanel), "width 50%:100%, height 50%:100%");
 		
 		this.revalidate();
 		
 	}
 
-	
+	@Override
+	public void suchErgebnisse(Map<Artikel, Integer> map) {
+		artikellistePanel.setArtikellisteNeu(map);
+		searchPanel.textFeldLoeschen();
+	}
 }

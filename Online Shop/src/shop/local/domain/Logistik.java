@@ -125,6 +125,20 @@ public class Logistik {
 			throw new ArtikelNichtVorhandenException();
 	}
 	
+	public Map<Artikel, Integer> sucheArtikelNamenTeil(String artikelName) throws ArtikelNichtVorhandenException {
+		Map<Artikel, Integer> gesuchtes = new TreeMap<Artikel, Integer>(new ArtikelNameComparator());
+		if (inhalt != null) {
+			for (Map.Entry<Artikel, Integer> entry : inhalt.entrySet()) {
+				if (((entry.getKey().getName()).indexOf( artikelName)) != -1) {
+					gesuchtes.put(entry.getKey(), entry.getValue());
+					
+				}
+			}
+			return  gesuchtes;
+		}
+			throw new ArtikelNichtVorhandenException();
+	}
+	
 	public Ereignisverwaltung getEreignisverwaltung() {
 		return this.ereignisverwaltung;
 	}

@@ -75,6 +75,11 @@ public class Shop {
 	public Artikel sucheNachWare(String name) throws ArtikelNichtVorhandenException {
 		return logistik.sucheArtikelName(name);
 	}
+	
+	// Einen Artikel aus dem Lager heraussuchen
+		public Map<Artikel, Integer> sucheNachWarenTeil(String name) throws ArtikelNichtVorhandenException {
+			return logistik.sucheArtikelNamenTeil(name);
+		}
 
 	// Anzahl eines Artikel zurückgeben
 	public Integer gibAnzahl(Artikel artikel) {
@@ -155,46 +160,17 @@ public class Shop {
 		}
 	}
 
-//	public String getNutzerName(UUID uuid) {
-//		return nutzerverwaltung.aktuellerMitarbeiterOderKunde(uuid).getNutzerName();
-//	}
-//
-//	public String getVorName(UUID uuid) {
-//		return nutzerverwaltung.aktuellerMitarbeiterOderKunde(uuid).getVorName();
-//	}
-//
-//	public String getNachName(UUID uuid) {
-//		return nutzerverwaltung.aktuellerMitarbeiterOderKunde(uuid).getNachName();
-//	}
-//
-//	public float getGuthaben(UUID uuid) {
-//		Kunde kunde = (Kunde) nutzerverwaltung.aktuellerMitarbeiterOderKunde(uuid);
-//		return kunde.getGuthaben();
-//	}
-//
-//	public int getPlz(UUID uuid) {
-//		Kunde kunde = (Kunde) nutzerverwaltung.aktuellerMitarbeiterOderKunde(uuid);
-//		return kunde.getPlz();
-//	}
 
 	public Nutzer getUser(UUID uuid) {
 		return nutzerverwaltung.aktuellerMitarbeiterOderKunde(uuid);
 	}
 
-//	public String getStrasse(UUID uuid) {
-//		Kunde kunde = (Kunde) nutzerverwaltung.aktuellerMitarbeiterOderKunde(uuid);
-//		return kunde.getStrasse();
-//	}
-//
+
 	public Warenkorb getWarenkorb(UUID uuid) {
 		Kunde kunde = (Kunde) nutzerverwaltung.aktuellerMitarbeiterOderKunde(uuid);
 		return kunde.getWarenkorb();
 	}
-//
-//	public String getWohnort(UUID uuid) {
-//		Kunde kunde = (Kunde) nutzerverwaltung.aktuellerMitarbeiterOderKunde(uuid);
-//		return kunde.getWohnort();
-//	}
+
 
 	public void uuidLoeschen(UUID uuid) {
 		nutzerverwaltung.getEingeloggteKunden().remove(uuid);
