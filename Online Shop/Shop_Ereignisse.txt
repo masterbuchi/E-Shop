@@ -1,0 +1,55 @@
+NEU
+09.05.2018 11:38
+leer
+0
+Dieter
+NEU
+09.05.2018 11:39
+Haus
+2
+Dieter
+LOESCHUNG
+09.05.2018 11:41
+Haus
+0
+Dieter
+NEU
+09.05.2018 12:02
+Elefant
+60
+Dieter
+EINLAGERUNG
+09.05.2018 12:13
+Hammer
+23
+Horst
+LOESCHUNG
+09.05.2018 12:40
+Hamster
+0
+Horst
+NEU
+09.05.2018 12:52
+Hamster
+2
+Horst
+LOESCHUNG
+09.05.2018 12:53
+Hammer
+0
+Horst
+NEU
+09.05.2018 13:33
+Gurke
+23
+Horst
+NEU
+09.05.2018 16:32
+Tim
+5
+Horst
+AUSLAGERUNG
+09.05.2018 16:34
+Tim
+2
+Alf
