@@ -33,7 +33,7 @@ public class Shop {
 	private PersistenceManager pm;
 
 	// Konstruktor
-	public Shop(String datei) throws IOException, ArtikelNichtVorhandenException, NutzerNichtVorhandenException {
+	public Shop(String datei) throws IOException{
 		ereignisverwaltung = new Ereignisverwaltung();
 		logistik = new Logistik(ereignisverwaltung);
 		nutzerverwaltung = new Nutzerverwaltung(ereignisverwaltung);
@@ -43,7 +43,7 @@ public class Shop {
 		logistik.liesArtikel(datei+"_Artikel.txt", pm);
 		nutzerverwaltung.liesKunde(datei+"_Kunden.txt", pm);
 		nutzerverwaltung.liesMitarbeiter(datei+"_Mitarbeiter.txt", pm);
-		ereignisverwaltung.liesTimestamp(datei+"_Ereignisse.txt", pm);
+		ereignisverwaltung.liesEreignisse(datei+"_Ereignisse.txt", pm);
 
 	}
 	
@@ -52,7 +52,7 @@ public class Shop {
 		logistik.schreibeArtikel(datei+"_Artikel.txt", pm);
 		nutzerverwaltung.schreibeKunde(datei+"_Kunden.txt", pm);
 		nutzerverwaltung.schreibeMitarbeiter(datei+"_Mitarbeiter.txt", pm);
-		ereignisverwaltung.schreibeTimestamp(datei+"_Ereignisse.txt", pm);
+		ereignisverwaltung.schreibeEreignisse(datei+"_Ereignisse.txt", pm);
 	}
 	
 
@@ -66,7 +66,7 @@ public class Shop {
 	// weitergegeben
 	public void artikelEinfuegen(String name, float preis, int anzahl, UUID uuid)
 			throws ArtikelBereitsVorhandenException {
-		Artikel a = new Artikel(0, name, preis);
+		Artikel a = new Artikel(0, name, preis, true);
 		logistik.hinzufuegen(a, anzahl, nutzerverwaltung.aktuellerMitarbeiterOderKunde(uuid));
 
 	}
@@ -75,6 +75,11 @@ public class Shop {
 	public Artikel sucheNachWare(String name) throws ArtikelNichtVorhandenException {
 		return logistik.sucheArtikelName(name);
 	}
+	
+	// Einen Artikel aus dem Lager heraussuchen
+		public Map<Artikel, Integer> sucheNachWarenTeil(String name) throws ArtikelNichtVorhandenException {
+			return logistik.sucheArtikelNamenTeil(name);
+		}
 
 	// Anzahl eines Artikel zurückgeben
 	public Integer gibAnzahl(Artikel artikel) {
@@ -89,7 +94,7 @@ public class Shop {
 	}
 
 	// Anzahl in der Logistik verändern
-	public void anzahlAendern(String name, int anzahlneu, UUID uuid) throws ArtikelNichtVorhandenException {
+	public void anzahlAendern(String name, int anzahlneu, UUID uuid) throws ArtikelNichtVorhandenException, NichtGenugArtikelException {
 		Artikel gesuchterArtikel = logistik.sucheArtikelName(name);
 		logistik.anzahl(gesuchterArtikel, anzahlneu, nutzerverwaltung.aktuellerMitarbeiterOderKunde(uuid));
 	}
@@ -155,46 +160,17 @@ public class Shop {
 		}
 	}
 
-//	public String getNutzerName(UUID uuid) {
-//		return nutzerverwaltung.aktuellerMitarbeiterOderKunde(uuid).getNutzerName();
-//	}
-//
-//	public String getVorName(UUID uuid) {
-//		return nutzerverwaltung.aktuellerMitarbeiterOderKunde(uuid).getVorName();
-//	}
-//
-//	public String getNachName(UUID uuid) {
-//		return nutzerverwaltung.aktuellerMitarbeiterOderKunde(uuid).getNachName();
-//	}
-//
-//	public float getGuthaben(UUID uuid) {
-//		Kunde kunde = (Kunde) nutzerverwaltung.aktuellerMitarbeiterOderKunde(uuid);
-//		return kunde.getGuthaben();
-//	}
-//
-//	public int getPlz(UUID uuid) {
-//		Kunde kunde = (Kunde) nutzerverwaltung.aktuellerMitarbeiterOderKunde(uuid);
-//		return kunde.getPlz();
-//	}
 
 	public Nutzer getUser(UUID uuid) {
 		return nutzerverwaltung.aktuellerMitarbeiterOderKunde(uuid);
 	}
 
-//	public String getStrasse(UUID uuid) {
-//		Kunde kunde = (Kunde) nutzerverwaltung.aktuellerMitarbeiterOderKunde(uuid);
-//		return kunde.getStrasse();
-//	}
-//
+
 	public Warenkorb getWarenkorb(UUID uuid) {
 		Kunde kunde = (Kunde) nutzerverwaltung.aktuellerMitarbeiterOderKunde(uuid);
 		return kunde.getWarenkorb();
 	}
-//
-//	public String getWohnort(UUID uuid) {
-//		Kunde kunde = (Kunde) nutzerverwaltung.aktuellerMitarbeiterOderKunde(uuid);
-//		return kunde.getWohnort();
-//	}
+
 
 	public void uuidLoeschen(UUID uuid) {
 		nutzerverwaltung.getEingeloggteKunden().remove(uuid);
@@ -246,8 +222,13 @@ public class Shop {
 
 	// Ereignisverwaltung
 
-	public List<Timestamp> ereignisseAusgeben() {
+	public List<Ereignis> ereignisseAusgeben() {
 		return ereignisverwaltung.ereignisseAusgeben();
+	}
+
+	public void setArtikelGelistet(String name, boolean selected) {
+		logistik.setArtikelGelistet(name, selected);
+		
 	}
 
 }

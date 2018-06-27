@@ -3,6 +3,7 @@ package shop.local.valueobjects;
 import java.util.TreeMap;
 
 import shop.local.domain.comparators.ArtikelNameComparator;
+import shop.local.domain.exceptions.ArtikelNichtVorhandenException;
 
 import java.util.Map;
 
@@ -26,8 +27,7 @@ public class Warenkorb {
 		inhalt.clear();
 	}
 
-	public Artikel sucheArtikelName(String artikelName) {
-		Artikel leererArtikel = null;
+	public Artikel sucheArtikelName(String artikelName) throws ArtikelNichtVorhandenException {
 		if (!inhalt.isEmpty()) {
 			for (Map.Entry<Artikel, Integer> entry : inhalt.entrySet()) {
 				if (entry.getKey().getName().equals(artikelName)) {
@@ -35,7 +35,7 @@ public class Warenkorb {
 				}
 			}
 		}
-		return leererArtikel;
+		throw new ArtikelNichtVorhandenException();
 	}
 
 	public int gibAnzahlZurueck(String name) {

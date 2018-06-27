@@ -2,33 +2,43 @@ package shop.local.ui.panels;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.UUID;
 
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
 import net.miginfocom.swing.MigLayout;
-import shop.local.ui.Listener.RegListener;
+import shop.local.domain.Shop;
+import shop.local.ui.werkzeuge.Listener.GUIListener;
+import shop.local.valueobjects.Nutzer;
 
 public class ButtonsPanel extends JPanel {
 	
 	
 	private JButton anmeldungButton = null;
 	private JButton registrierenButton = null;
+	private JButton warenkorbButton = null;
+	private JButton statistikButton = null;
 	private JButton alleArtikelButton = null;
 	private JButton logoutButton = null;
-	private RegListener regListener = null;
+	private GUIListener guiListener = null;
+	private UUID uuid;
+	private Nutzer nutzer;
+	private Shop shop;
 
 	// Konstruktor
-	public ButtonsPanel(String buttons, RegListener listener) {
-		regListener = listener;
+	public ButtonsPanel(Shop shop, String buttons, UUID uuid, GUIListener guiListener) {
+		this.uuid = uuid;
+		this.guiListener = guiListener;
+		this.shop = shop;
+		nutzer = shop.getUser(uuid);
+		
 		setUpButtons(buttons);
 		setUpButtonsEvents(buttons);
 
 	}
 
 	public void setUpButtons(String buttons) {
-
 		switch (buttons) {
 
 		case "Main":
@@ -40,6 +50,28 @@ public class ButtonsPanel extends JPanel {
 
 			this.add(anmeldungButton);
 			this.add(registrierenButton);
+			break;
+			
+		case "Kunde":
+			this.warenkorbButton = new JButton("Warenkorb");
+			this.logoutButton = new JButton("Logout");
+			
+			this.setLayout(new MigLayout());
+			
+			this.add(warenkorbButton);
+			this.add(logoutButton);
+			
+			break;
+		
+		case "Mitarbeiter":
+			this.statistikButton = new JButton("Statistiken");
+			this.logoutButton = new JButton("Logout");
+			
+			this.setLayout(new MigLayout());
+			
+			this.add(statistikButton);
+			this.add(logoutButton);
+			
 			break;
 
 		case "Warenkorb":
@@ -62,60 +94,82 @@ public class ButtonsPanel extends JPanel {
 		switch (buttons) {
 
 		case "Main":
-			anmeldungButton.addActionListener(new AnmeldungListener());
-			registrierenButton.addActionListener(new RegistrierenListener());
+			anmeldungButton.addActionListener(new AnmeldungButtonListener());
+			registrierenButton.addActionListener(new RegistrierenButtonListener());
+			break;
+		
+		case "Kunde":
+			warenkorbButton.addActionListener(new WarenkorbButtonListener());
+			logoutButton.addActionListener(new LogoutButtonListener());
+			break;
+			
+		case "Mitarbeiter":
+			//statistikButton.addActionListener(new WarenkorbButtonListener());
+			logoutButton.addActionListener(new LogoutButtonListener());
 			break;
 
 		case "Warenkorb":
-			alleArtikelButton.addActionListener(new AlleArtikelListener());
-			logoutButton.addActionListener(new LogoutListener());
+			alleArtikelButton.addActionListener(new AlleArtikelKundeButtonListener());
+			logoutButton.addActionListener(new LogoutButtonListener());
 			break;
-		case "registrieren":
-			//To do
+			
+			
 		}
 	}
 
 	// Lokale Klasse für Reaktion auf Anmeldungs-Klick
-	class AnmeldungListener implements ActionListener {
+	class AnmeldungButtonListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(ActionEvent ae) {
 			if (ae.getSource().equals(anmeldungButton)) {
-				// TO-DO
+				guiListener.anmPanel();
 			}
 		}
 	}
+	
+	// Lokale Klasse f�r Reaktion auf Warenkorb-Klick
+		class WarenkorbButtonListener implements ActionListener {
+
+			@Override
+			public void actionPerformed(ActionEvent ae) {
+				if (ae.getSource().equals(warenkorbButton)) {
+					guiListener.warenkorbPanel();
+				}
+			}
+		}
+
 
 	// Lokale Klasse für Reaktion auf Registrieren-Klick
-	class RegistrierenListener implements ActionListener {
+	class RegistrierenButtonListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(ActionEvent ae) {
 			if (ae.getSource().equals(registrierenButton)) {
-				regListener.regPanel();
+				guiListener.regPanel();
 			}
 		}
 
 	}
 
 	// Lokale Klasse für Reaktion auf AlleArtikel-Klick
-	class AlleArtikelListener implements ActionListener {
+	class AlleArtikelKundeButtonListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(ActionEvent ae) {
 			if (ae.getSource().equals(alleArtikelButton)) {
-				// TO-DO
+				guiListener.kundeMainPanel(uuid, nutzer);
 			}
 		}
 	}
 
 	// Lokale Klasse für Reaktion auf Logout-Klick
-	class LogoutListener implements ActionListener {
+	class LogoutButtonListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(ActionEvent ae) {
 			if (ae.getSource().equals(logoutButton)) {
-				// TO-DO
+				guiListener.logoutPanel();
 			}
 		}
 	}

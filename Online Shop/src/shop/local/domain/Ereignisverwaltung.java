@@ -1,8 +1,8 @@
 package shop.local.domain;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Vector;
 
 import shop.local.domain.exceptions.ArtikelNichtVorhandenException;
@@ -10,54 +10,54 @@ import shop.local.domain.exceptions.NutzerNichtVorhandenException;
 import shop.local.persistence.PersistenceManager;
 import shop.local.valueobjects.Artikel;
 import shop.local.valueobjects.Nutzer;
-import shop.local.valueobjects.Timestamp;
-import shop.local.valueobjects.Timestamp.EreignisTyp;
+import shop.local.valueobjects.Ereignis;
+import shop.local.valueobjects.Ereignis.EreignisTyp;
 
 public class Ereignisverwaltung {
 
-	private List<Timestamp> ereignisse;
+	private List<Ereignis> ereignisse;
 
 	public Ereignisverwaltung() {
-		ereignisse = new Vector<Timestamp>();
+		ereignisse = new Vector<Ereignis>();
 	}
 
-	public void liesTimestamp(String datei, PersistenceManager pm) throws IOException, ArtikelNichtVorhandenException, NutzerNichtVorhandenException {
+	public void liesEreignisse(String datei, PersistenceManager pm) throws IOException {
 		// PersistenceManager zum Lesen öffnen
 		pm.openForReading(datei);
 
-		Timestamp timestamp;
+		Ereignis ereignis;
 		do {
-			timestamp = pm.ladeTimestamp();
-			if (timestamp != null) {
-				ereignisse.add(timestamp);
+			ereignis = pm.ladeEreignis();
+			if (ereignis != null) {
+				ereignisse.add(ereignis);
 			}
-		} while (timestamp != null);
+		} while (ereignis != null);
 
 		// Schließen
 		pm.close();
 	}
 
-	public void schreibeTimestamp(String datei, PersistenceManager pm) throws IOException {
+	public void schreibeEreignisse(String datei, PersistenceManager pm) throws IOException {
 		// PersistenceManager zum Lesen öffnen
 		pm.openForWriting(datei);
 
-		for (Timestamp timestamp : ereignisse) {
-			pm.speichereTimestamp(timestamp);
+		for (Ereignis ereignis : ereignisse) {
+			pm.speichereEreignis(ereignis);
 			}
 
 		// Persistenzmanager schließen
 		pm.close();
 	}
 
-	public void timestamp(String zeit, EreignisTyp info, Artikel artikel, int anzahl, Nutzer user) {
+	public void ereignis(LocalDateTime zeit, EreignisTyp info, Artikel artikel, int anzahl, Nutzer user) {
 
-		Timestamp ts = new Timestamp(zeit, info, artikel, anzahl, user);
+		Ereignis ts = new Ereignis(zeit, info, artikel, anzahl, user);
 		ereignisse.add(ts);
 
 	}
 
 	// Timestampliste ausgeben
-	public List<Timestamp> ereignisseAusgeben() {
+	public List<Ereignis> ereignisseAusgeben() {
 		return (ereignisse);
 	}
 
