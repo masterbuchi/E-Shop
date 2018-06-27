@@ -14,17 +14,17 @@ public class Artikel {
 
 	// --- Eigenschaften ---
 
-	// public static AtomicInteger nextId = new AtomicInteger();
 	public static AtomicInteger maxId = new AtomicInteger(0);
 
 	private int id;
 	private String name;
 	private float preis;
 	private String preistext;
+	boolean gelistet;
 
 	// --- Ergänzbare Eigenschaften ---
 
-	public Artikel(int id, String name, float preis) {
+	public Artikel(int id, String name, float preis, boolean gelistet) {
 
 		// Nummer wird normalerweise nicht durch User gesetzt, sondern automatisch
 		// generiert.
@@ -36,6 +36,7 @@ public class Artikel {
 			this.id = id;
 
 		}
+		this.gelistet = gelistet;
 		this.name = name;
 		this.preis = preis;
 
@@ -82,5 +83,14 @@ public class Artikel {
 	public void setPreis(float preis) {
 		this.preis = preis;
 	}
+	
+	public boolean getGelistet() {
+		return this.gelistet;
+	}
+	
+	public void setGelistet(boolean gelistet) {
+		this.gelistet = gelistet;
+	}
+	
 
 }

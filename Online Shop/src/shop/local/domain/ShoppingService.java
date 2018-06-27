@@ -8,7 +8,7 @@ import shop.local.domain.exceptions.NichtGenugArtikelException;
 import shop.local.valueobjects.Artikel;
 import shop.local.valueobjects.Kunde;
 import shop.local.valueobjects.Warenkorb;
-import shop.local.valueobjects.Timestamp.EreignisTyp;
+import shop.local.valueobjects.Ereignis.EreignisTyp;
 
 public class ShoppingService {
 
@@ -31,8 +31,6 @@ public class ShoppingService {
 		// passenden Artikel im Lagerbestand der Logistik suchen
 		Artikel logistikArtikel = logistik.sucheArtikelName(name);
 
-		if (logistikArtikel != null) {
-
 			Warenkorb korb = kunde.getWarenkorb();
 
 			if (korb.getMap().containsKey(logistikArtikel)) {
@@ -46,10 +44,6 @@ public class ShoppingService {
 				throw new NichtGenugArtikelException(logistikArtikel);
 			}
 			kunde.setWarenkorb(korb);
-		} else {
-			throw new ArtikelNichtVorhandenException();
-
-		}
 
 	}
 
@@ -57,27 +51,21 @@ public class ShoppingService {
 	
 	
 	public void wareAnzahlAendern(Kunde kunde, String name, int anzahl)
-			throws ArtikelNichtVorhandenException, NichtGenugArtikelException {
-
-		Artikel logistikArtikel = logistik.sucheArtikelName(name);
-
-		if (logistikArtikel != null) {
+			throws NichtGenugArtikelException, ArtikelNichtVorhandenException {
 
 			Warenkorb korb = kunde.getWarenkorb();
 
 			Artikel korbArtikel = korb.sucheArtikelName(name);
 
-			if (anzahl <= logistik.gibAnzahlZurueck(logistikArtikel) - korb.getMap().get(korbArtikel)) {
+			if (anzahl <= logistik.gibAnzahlZurueck(korbArtikel)) {
 
-				korb.hinzufuegen(korbArtikel, anzahl + korb.getMap().get(korbArtikel));
+				korb.hinzufuegen(korbArtikel, anzahl);
 
 			} else {
-				throw new NichtGenugArtikelException(logistikArtikel);
+				throw new NichtGenugArtikelException(korbArtikel);
 			}
 			kunde.setWarenkorb(korb);
-		} else {
-			throw new ArtikelNichtVorhandenException();
-		}
+		
 	}
 
 	// Löscht einen Artikel aus dem Warenkorb
@@ -131,7 +119,7 @@ public class ShoppingService {
 					if (entry.getValue() <= logistik.getLagerBestand().get(entry.getKey())) {
 						logistik.getLagerBestand().put(entry.getKey(),
 								(logistik.getLagerBestand().get(entry.getKey()) - entry.getValue()));
-						logistik.getEreignisverwaltung().timestamp(null, EreignisTyp.AUSLAGERUNG, entry.getKey(),
+						logistik.getEreignisverwaltung().ereignis(null, EreignisTyp.AUSLAGERUNG, entry.getKey(),
 								entry.getValue(), kunde);
 					} else {
 						throw new NichtGenugArtikelException(entry.getKey());

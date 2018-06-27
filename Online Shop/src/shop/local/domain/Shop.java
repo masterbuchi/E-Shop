@@ -33,28 +33,27 @@ public class Shop {
 	private PersistenceManager pm;
 
 	// Konstruktor
-	public Shop(String datei) throws IOException, ArtikelNichtVorhandenException, NutzerNichtVorhandenException {
+	public Shop(String datei) throws IOException {
 		ereignisverwaltung = new Ereignisverwaltung();
 		logistik = new Logistik(ereignisverwaltung);
 		nutzerverwaltung = new Nutzerverwaltung(ereignisverwaltung);
 		shoppingService = new ShoppingService(logistik);
 		pm = new FilePersistenceManager(logistik, nutzerverwaltung);
 		this.datei = datei;
-		logistik.liesArtikel(datei+"_Artikel.txt", pm);
-		nutzerverwaltung.liesKunde(datei+"_Kunden.txt", pm);
-		nutzerverwaltung.liesMitarbeiter(datei+"_Mitarbeiter.txt", pm);
-		ereignisverwaltung.liesTimestamp(datei+"_Ereignisse.txt", pm);
+		logistik.liesArtikel(datei + "_Artikel.txt", pm);
+		nutzerverwaltung.liesKunde(datei + "_Kunden.txt", pm);
+		nutzerverwaltung.liesMitarbeiter(datei + "_Mitarbeiter.txt", pm);
+		ereignisverwaltung.liesEreignisse(datei + "_Ereignisse.txt", pm);
 
 	}
-	
+
 	public void speichern() throws IOException {
-		
-		logistik.schreibeArtikel(datei+"_Artikel.txt", pm);
-		nutzerverwaltung.schreibeKunde(datei+"_Kunden.txt", pm);
-		nutzerverwaltung.schreibeMitarbeiter(datei+"_Mitarbeiter.txt", pm);
-		ereignisverwaltung.schreibeTimestamp(datei+"_Ereignisse.txt", pm);
+
+		logistik.schreibeArtikel(datei + "_Artikel.txt", pm);
+		nutzerverwaltung.schreibeKunde(datei + "_Kunden.txt", pm);
+		nutzerverwaltung.schreibeMitarbeiter(datei + "_Mitarbeiter.txt", pm);
+		ereignisverwaltung.schreibeEreignisse(datei + "_Ereignisse.txt", pm);
 	}
-	
 
 	// Alle Artikel aus der Logistik werden abgerufen und der CUI zurückgegeben
 	public Map<Artikel, Integer> alleArtikelAusgeben() {
@@ -64,22 +63,21 @@ public class Shop {
 
 	// Mit den Informationen der CUI wird ein Artikel erstellt und an die Logistik
 	// weitergegeben
-	public void artikelEinfuegen(String name, float preis, int anzahl, UUID uuid)
+	public void artikelEinfuegen(String name, float preis, int anzahl, boolean gelistet, UUID uuid)
 			throws ArtikelBereitsVorhandenException {
-		Artikel a = new Artikel(0, name, preis);
+		Artikel a = new Artikel(0, name, preis, gelistet);
 		logistik.hinzufuegen(a, anzahl, nutzerverwaltung.aktuellerMitarbeiterOderKunde(uuid));
-
 	}
 
 	// Einen Artikel aus dem Lager heraussuchen
 	public Artikel sucheNachWare(String name) throws ArtikelNichtVorhandenException {
 		return logistik.sucheArtikelName(name);
 	}
-	
+
 	// Einen Artikel aus dem Lager heraussuchen
-		public Map<Artikel, Integer> sucheNachWarenTeil(String name) throws ArtikelNichtVorhandenException {
-			return logistik.sucheArtikelNamenTeil(name);
-		}
+	public Map<Artikel, Integer> sucheNachWarenTeil(String name) throws ArtikelNichtVorhandenException {
+		return logistik.sucheArtikelNamenTeil(name);
+	}
 
 	// Anzahl eines Artikel zurückgeben
 	public Integer gibAnzahl(Artikel artikel) {
@@ -94,7 +92,8 @@ public class Shop {
 	}
 
 	// Anzahl in der Logistik verändern
-	public void anzahlAendern(String name, int anzahlneu, UUID uuid) throws ArtikelNichtVorhandenException {
+	public void anzahlAendern(String name, int anzahlneu, UUID uuid)
+			throws ArtikelNichtVorhandenException, NichtGenugArtikelException {
 		Artikel gesuchterArtikel = logistik.sucheArtikelName(name);
 		logistik.anzahl(gesuchterArtikel, anzahlneu, nutzerverwaltung.aktuellerMitarbeiterOderKunde(uuid));
 	}
@@ -160,17 +159,14 @@ public class Shop {
 		}
 	}
 
-
 	public Nutzer getUser(UUID uuid) {
 		return nutzerverwaltung.aktuellerMitarbeiterOderKunde(uuid);
 	}
-
 
 	public Warenkorb getWarenkorb(UUID uuid) {
 		Kunde kunde = (Kunde) nutzerverwaltung.aktuellerMitarbeiterOderKunde(uuid);
 		return kunde.getWarenkorb();
 	}
-
 
 	public void uuidLoeschen(UUID uuid) {
 		nutzerverwaltung.getEingeloggteKunden().remove(uuid);
@@ -222,8 +218,16 @@ public class Shop {
 
 	// Ereignisverwaltung
 
-	public List<Timestamp> ereignisseAusgeben() {
+	public List<Ereignis> ereignisseAusgeben() {
 		return ereignisverwaltung.ereignisseAusgeben();
 	}
 
+	public void setArtikelGelistet(String name, boolean selected) {
+		logistik.setArtikelGelistet(name, selected);
+
+	}
+
+	public void setPreis(String name, float preis) {
+		logistik.setPreis(name, preis);
+	}
 }

@@ -10,7 +10,7 @@ import java.util.Vector;
 import shop.local.domain.exceptions.*;
 import shop.local.persistence.PersistenceManager;
 import shop.local.valueobjects.*;
-import shop.local.valueobjects.Timestamp.EreignisTyp;
+import shop.local.valueobjects.Ereignis.EreignisTyp;
 
 /**
  * 
@@ -98,9 +98,9 @@ public class Nutzerverwaltung {
 		} else if (kundenListe.contains(test)) {
 			throw new MitarbeiterBereitsVorhandenException(m1);
 		}
-		Artikel artikel = new Artikel(-1, "leer", 0f);
+		Artikel artikel = new Artikel(-1, "leer", 0f, false);
 		mitarbeiterListe.add(m1);
-		ereignisverwaltung.timestamp(null, EreignisTyp.NEU, artikel, 0, m1);
+		ereignisverwaltung.ereignis(null, EreignisTyp.NEU, artikel, 0, m1);
 	}
 
 	// Kunde hinzufügen
@@ -111,9 +111,9 @@ public class Nutzerverwaltung {
 		} else if (mitarbeiterListe.contains(test)) {
 			throw new KundeBereitsVorhandenException(k1);
 		}
-		Artikel artikel = new Artikel(-1, "leer", 0f);
+		Artikel artikel = new Artikel(-1, "leer", 0f, false);
 		kundenListe.add(k1);
-		ereignisverwaltung.timestamp(null, EreignisTyp.NEU, artikel, 0, k1);
+		ereignisverwaltung.ereignis(null, EreignisTyp.NEU, artikel, 0, k1);
 	}
 
 	// Die übergebenen Logindaten werden mit den beiden Listen (Mitarbeiter und

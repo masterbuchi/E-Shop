@@ -6,6 +6,7 @@ import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
@@ -15,8 +16,7 @@ import net.miginfocom.swing.MigLayout;
 import shop.local.domain.Shop;
 import shop.local.domain.exceptions.KundeBereitsVorhandenException;
 import shop.local.domain.exceptions.MitarbeiterBereitsVorhandenException;
-import shop.local.ui.Listener.MainListener;
-import shop.local.ui.Listener.RegListener;
+import shop.local.ui.werkzeuge.Listener.GUIListener;
 import shop.local.valueobjects.Artikel;
 import shop.local.valueobjects.Kunde;
 import shop.local.valueobjects.Mitarbeiter;
@@ -25,13 +25,14 @@ public class RegistrierenPanel extends JPanel {
 
 	private String mitarbeiterOderKunde;
 	private Shop shop;
-	private MainListener mainListener = null;
-
+	private GUIListener guiListener = null;
+	private JFrame guiframe;
 
 	// Konstruktor
-	public RegistrierenPanel(String mitarbeiter, Shop shop, MainListener listener) {
-		this.mainListener = listener;
+	public RegistrierenPanel(String mitarbeiter, Shop shop, JFrame guiframe, GUIListener listener) {
+		this.guiListener = listener;
 		this.shop = shop;
+		this.guiframe = guiframe;
 		if (mitarbeiter.equals("Mitarbeiter")) {
 			mitarbeiterOderKunde = "Mitarbeiter";
 			setUpUIM();
@@ -41,6 +42,8 @@ public class RegistrierenPanel extends JPanel {
 			setUpUIK();
 			setUpEvents();
 		}
+		guiframe.getRootPane().setDefaultButton(registrierButton);
+
 	}
 
 	// Attribute
@@ -64,6 +67,7 @@ public class RegistrierenPanel extends JPanel {
 	JButton zurueckButton = new JButton("Zurück");
 	JLabel space = new JLabel(" ");
 	JButton spaceB = new JButton(" ");
+	
 
 	// Layout Mitarbeiter
 	public void setUpUIM() {
@@ -71,14 +75,14 @@ public class RegistrierenPanel extends JPanel {
 
 		this.setLayout(new MigLayout("center, center", "[]30[]"));
 
-		this.add(vorname);
-		this.add(nutzername, "wrap");
-		this.add(vornameText);
-		this.add(nutzernameText, "wrap");
-		this.add(nachname);
+		this.add(nutzername);
 		this.add(passwort, "wrap");
-		this.add(nachnameText);
+		this.add(nutzernameText);
 		this.add(passwortText, "wrap");
+		this.add(vorname);
+		this.add(nachname, "wrap");
+		this.add(vornameText);
+		this.add(nachnameText, "wrap");
 		this.add(space, "span");
 		this.add(fehler, "span");
 		this.add(zurueckButton);
@@ -96,15 +100,14 @@ public class RegistrierenPanel extends JPanel {
 		setBorder(BorderFactory.createTitledBorder("Registrieren"));
 
 		this.setLayout(new MigLayout("center, center", "[][]30[][]"));
-		this.add(vorname, "span 2");
-		this.add(nachname, "wrap, span 2");
-		this.add(vornameText, "span 2");
-		this.add(nachnameText, "wrap, span 2");
-
 		this.add(nutzername, "span 2");
 		this.add(passwort, "wrap, span 2");
 		this.add(nutzernameText, "span 2");
 		this.add(passwortText, "wrap, span 2");
+		this.add(vorname, "span 2");
+		this.add(nachname, "wrap, span 2");
+		this.add(vornameText, "span 2");
+		this.add(nachnameText, "wrap, span 2");
 		this.add(strasseHausnr, "span 2");
 		this.add(plzOrt, "wrap");
 		this.add(strasseText);
@@ -119,12 +122,13 @@ public class RegistrierenPanel extends JPanel {
 
 	}
 
+	// Lokale Klasse für die Reaktion auf Zurück-Klick
 	class ZurueckListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(ActionEvent ae) {
 			if (ae.getSource().equals(zurueckButton)) {
-				mainListener.mainPanel();
+				guiListener.mainPanel();
 			}
 		}
 	}
@@ -158,18 +162,26 @@ public class RegistrierenPanel extends JPanel {
 						vorName = vornameText.getText();
 						nachName = nachnameText.getText();
 						passwort = passwortText.getText();
-						// Mitarbeiterinformationen wird an Shop zum Einfügen übergeben
-						try {
-							shop.mitarbeiterHinzufuegen(nutzerName, vorName, nachName, passwort);
 
-							// falls die Fehlermeldung für einen doppelten Namen geworfen wird
-						} catch (MitarbeiterBereitsVorhandenException e) {
+						if (nutzerName.isEmpty() || vorName.isEmpty() || nachName.isEmpty() || passwort.isEmpty()) {
+							fehler.setText("Bitte füllen Sie alle Pflichtangaben aus.");
 							erfolgreich = false;
-							// Bei gleichem Mitarbeiternamen:
-							fehler.setText("Ein Mitarbeiter mit dem Benutzernamen " + e.getMitarbeiter().getNutzerName()
-									+ " ist bereits vorhanden. Bitte wählen sie einen anderen Benutzernamen.");
+
+						} else {
+							// Mitarbeiterinformationen wird an Shop zum Einfügen übergeben
+							try {
+								shop.mitarbeiterHinzufuegen(nutzerName, vorName, nachName, passwort);
+
+								// falls die Fehlermeldung für einen doppelten Namen geworfen wird
+							} catch (MitarbeiterBereitsVorhandenException e) {
+								erfolgreich = false;
+								// Bei gleichem Mitarbeiternamen:
+								fehler.setText("Ein Mitarbeiter mit dem Benutzernamen "
+										+ e.getMitarbeiter().getNutzerName()
+										+ " ist bereits vorhanden. Bitte wählen sie einen anderen Benutzernamen.");
+							}
+							// Bei fehlerhafter Eingabe von Eingaben (falsche Zahl, Kommazahl etc.)
 						}
-						// Bei fehlerhafter Eingabe von Eingaben (falsche Zahl, Kommazahl etc.)
 					} catch (NumberFormatException n) {
 						erfolgreich = false;
 						fehler.setText(
@@ -178,6 +190,8 @@ public class RegistrierenPanel extends JPanel {
 
 				} else {
 					try {
+
+						// ABFANGEN DAS DIE FELDER NICHT LEER SEIN DÜRFEN
 						nutzerName = nutzernameText.getText();
 						vorName = vornameText.getText();
 						nachName = nachnameText.getText();
@@ -188,15 +202,23 @@ public class RegistrierenPanel extends JPanel {
 						plz = Integer.parseInt(postleitzahl);
 						wohnort = ortText.getText();
 
-						// Kundeninformationen wird an Shop zum Einfügen übergeben
-						try {
-							shop.kundeHinzufuegen(nutzerName, vorName, nachName, passwort, strasse, plz, wohnort);
-							// falls die Fehlermeldung für einen doppelten Namen geworfen wird
-						} catch (KundeBereitsVorhandenException e) {
+						if (nutzerName.isEmpty() || vorName.isEmpty() || nachName.isEmpty() || passwort.isEmpty()
+								|| strasse.isEmpty() || postleitzahl.isEmpty() || wohnort.isEmpty()) {
+							fehler.setText("Bitte füllen Sie alle Pflichtangaben aus.");
 							erfolgreich = false;
-							// Bei gleichem Kundennamen:
-							fehler.setText("Ein Kunde mit dem Benutzernamen " + e.getKunde().getNutzerName()
-									+ " ist bereits vorhanden. Bitte wählen sie einen anderen Benutzernamen.");
+
+						} else {
+							// Kundeninformationen wird an Shop zum Einfügen übergeben
+							try {
+								shop.kundeHinzufuegen(nutzerName, vorName, nachName, passwort, strasse, plz, wohnort);
+
+								// falls die Fehlermeldung für einen doppelten Namen geworfen wird
+							} catch (KundeBereitsVorhandenException e) {
+								erfolgreich = false;
+								// Bei gleichem Kundennamen:
+								fehler.setText("Ein Kunde mit dem Benutzernamen " + e.getKunde().getNutzerName()
+										+ " ist bereits vorhanden. Bitte wählen sie einen anderen Benutzernamen.");
+							}
 						}
 						// Bei fehlerhafter Eingabe von Eingaben (falsche Zahl, Kommazahl etc.)
 					} catch (NumberFormatException n) {
@@ -207,9 +229,9 @@ public class RegistrierenPanel extends JPanel {
 
 				}
 
- if (erfolgreich) {
-	 mainListener.mainPanel();
- }
+				if (erfolgreich) {
+					guiListener.mainPanel();
+				}
 
 			}
 		}

@@ -7,6 +7,7 @@ import java.util.TreeMap;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
@@ -14,7 +15,7 @@ import net.miginfocom.swing.MigLayout;
 import shop.local.domain.*;
 import shop.local.domain.comparators.ArtikelNameComparator;
 import shop.local.domain.exceptions.ArtikelNichtVorhandenException;
-import shop.local.ui.Listener.SuchListener;
+import shop.local.ui.werkzeuge.Listener.GUIListener;
 import shop.local.valueobjects.Artikel;
 
 public class SearchPanel extends JPanel {
@@ -22,12 +23,14 @@ public class SearchPanel extends JPanel {
 	private JTextField searchTextField;
 	private JButton searchButton = null;
 	private Shop shop = null;
-	private SuchListener suchListener = null;
+	private GUIListener guiListener = null;
+	private JFrame guiframe;
 
 	// Konstruktor
-	public SearchPanel(Shop shop, SuchListener listener) {
-		suchListener = listener;
+	public SearchPanel(Shop shop, JFrame guiframe, GUIListener listener) {
+		guiListener = listener;
 		this.shop = shop;
+		this.guiframe = guiframe;
 		setUpSearch();
 		setUpSearchEvents();
 
@@ -42,6 +45,7 @@ public class SearchPanel extends JPanel {
 
 		this.add(searchTextField, "left, width 50%:100%");
 		this.add(searchButton);
+		guiframe.getRootPane().setDefaultButton(searchButton);
 
 	}
 
@@ -60,17 +64,18 @@ public class SearchPanel extends JPanel {
 
 				if (suchbegriff.isEmpty()) {
 					ergebnis = shop.alleArtikelAusgeben();
-					suchListener.suchErgebnisse(ergebnis);
+					guiListener.suchErgebnisse(ergebnis);
 
-				} else
+				} else {
 					try {
 						ergebnis = shop.sucheNachWarenTeil(suchbegriff);
-						suchListener.suchErgebnisse(ergebnis);
+						guiListener.suchErgebnisse(ergebnis);
 					} catch (ArtikelNichtVorhandenException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 
+				}
 			}
 		}
 	}
@@ -78,10 +83,9 @@ public class SearchPanel extends JPanel {
 	public String getTextSuche() {
 		return searchTextField.getText();
 	}
-	
+
 	public void textFeldLoeschen() {
 		searchTextField.setText("");
 	}
-
 
 }

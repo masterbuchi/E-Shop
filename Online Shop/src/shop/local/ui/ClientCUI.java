@@ -349,7 +349,7 @@ public class ClientCUI {
 		String artikelName;
 		Map<Artikel, Integer> lagerBestand;
 
-		List<Timestamp> ereignisse;
+		List<Ereignis> ereignisse;
 
 		// Eingabe bearbeiten:
 		switch (line) {
@@ -418,6 +418,9 @@ public class ClientCUI {
 					shop.anzahlAendern(name, anz, aktuelleUUID);
 				} catch (ArtikelNichtVorhandenException v) {
 					System.out.println(v);
+				} catch (NichtGenugArtikelException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 			} catch (NumberFormatException n) {
 				System.out.println("Fehlerhafte Eingabe, bitte beginnen Sie erneut.");
@@ -457,7 +460,7 @@ public class ClientCUI {
 				}
 				// Artikel wird an Shop zum Einfügen übergeben
 				try {
-					shop.artikelEinfuegen(name, prs, anz, aktuelleUUID);
+					shop.artikelEinfuegen(name, prs, anz, true, aktuelleUUID);
 					System.out.println("Einfügen ok");
 
 				} catch (ArtikelBereitsVorhandenException e) {
@@ -471,6 +474,9 @@ public class ClientCUI {
 						try {
 							shop.anzahlAendern(name, anz, aktuelleUUID);
 						} catch (ArtikelNichtVorhandenException e1) {
+							e1.printStackTrace();
+						} catch (NichtGenugArtikelException e1) {
+							// TODO Auto-generated catch block
 							e1.printStackTrace();
 						}
 					}
@@ -757,7 +763,6 @@ public class ClientCUI {
 						System.out.print(" [n] / Press any Button for yes > ");
 						best = liesEingabe();
 
-						
 						if (best.equals("n")) {
 
 							System.out.println("");
@@ -889,12 +894,12 @@ public class ClientCUI {
 	}
 
 	// Ereignisse auslesen und ausgeben
-	private void gibEreignisseWieder(List<Timestamp> ereignisse) {
+	private void gibEreignisseWieder(List<Ereignis> ereignisse) {
 		if (ereignisse == null) {
 			System.out.println("Es sind keine Ereignisse vorhanden");
 		} else {
-			for (Timestamp timestamp : ereignisse) {
-				System.out.println(timestamp);
+			for (Ereignis ereignis : ereignisse) {
+				System.out.println(ereignis);
 			}
 		}
 	}
